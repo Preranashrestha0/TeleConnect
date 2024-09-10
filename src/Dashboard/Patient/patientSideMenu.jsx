@@ -25,11 +25,11 @@ const PatientHomePage = () => {
           <Menu className='text-start font-semibold' theme='light' mode='inline' onClick={handleMenuClick}> 
             <Menu.Item key="/patient/dashboard" icon={<AiOutlineDashboard/>}>Dashboard</Menu.Item>
             <Menu.Item key="/patient/patient/search" icon={<AiOutlineSearch/>}> Search</Menu.Item>
-            <Menu.Item key="/patient/patient/list" icon={<AiOutlineMessage/>}> My Chats</Menu.Item>
+            <Menu.Item key="/patient/patient/chats" icon={<AiOutlineMessage/>}> My Chats</Menu.Item>
             <Menu.Item key="/patient/patient/prescription" icon={<AiOutlineMedicineBox/>}> My Prescription</Menu.Item>
             <Menu.Item key="/patient/patient/bookings" icon={<AiOutlineBook/>}> My Bookings</Menu.Item>
             <Menu.Item key="/patient/patient/profile" icon={<AiOutlineProfile/>}> My Account</Menu.Item>
-            <Menu.Item key="logout" icon={<AiOutlineLogout/>}>LogOut</Menu.Item>
+            <Menu.Item key="/logout" icon={<AiOutlineLogout/>}>LogOut</Menu.Item>
 
           </Menu>
         </div>

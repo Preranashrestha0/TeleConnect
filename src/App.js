@@ -28,7 +28,13 @@ import MessagingComponent from './Dashboard/Patient/PatientChats';
 import Chat from './Dashboard/Patient/PatientChats';
 import AppointmentList from './Dashboard/Patient/appointmentList';
 import DoctorProfile from './Dashboard/doctor/doctorProfile';
-import Logout from './Dashboard/Admin/logout';
+import ChatComponent from './Dashboard/Patient/PatientChats';
+import Logout from './Components/LogOut/logout';
+import EditMyProfileDoc from './Dashboard/doctor/EditMyProfile';
+import DoctorDashboard from './Dashboard/doctor/DoctorDashboard';
+import DoctorSideMenu from './Dashboard/doctor/doctorSideMenu';
+import ReviewForm from './Dashboard/Patient/reviewForm';
+// import AddPrescriptons from './Dashboard/doctor/AddPrescriptions';
 
 
 
@@ -37,7 +43,17 @@ function App() {
   const navigate = useNavigate();
 
   // Define routes where the Navbar should not be displayed
-  const hideNavbarRoutes = ['/admin', '/doctor/homepage', '/patient/homepage', '/admin/manageDoctor', '/patient/profile','/patient/list', '/patient/edit/', '/patient', 'patient/dashboard'];
+  const hideNavbarRoutes = ['/admin',
+     '/doctor/homepage', 
+     '/patient/homepage',
+      '/admin/manageDoctor',
+       '/patient/profile',
+       '/patient/list',
+        '/patient/edit/',
+         '/patient', 
+         'patient/dashboard',
+         '/doctor'
+        ];
 
   // Check if current path includes the dynamic segment
   const shouldHideNavbar = hideNavbarRoutes.some(route => location.pathname.startsWith(route));
@@ -57,6 +73,7 @@ function App() {
       <Route path='/contactUs' element ={<ContactUs />}/>
       <Route path='/doctor/homepage' element={<DoctorHomePage/>}/>
       <Route path='/patient/profile' element={<ProfileView/>}/>
+      <Route path='/logout' element={<Logout handleLogout={handleLogout} />} />
 
 
       {/* <Route path='/admin/manageDoctor' element={<ManageDoc/>}/> */}
@@ -72,9 +89,9 @@ function App() {
 
       {/* Patient Routes with Sidebar */}
       <Route path='/patient' element={<PatientHomePage />}>
-        {/* <Route path='dashboard' element={<PatientProfile />} /> */}
+        <Route path='dashboard' element={<PatientProfile />} />
         <Route path='patient/prescription' element={<PatientPrescription />} />
-        <Route path='patient/chats/:userId' element={<Chat />} />
+        <Route path='patient/review/:prescriptionId' element={<ReviewForm />} />
         <Route path='patient/bookings' element={<AppointmentBooking />} />
         <Route path='patient/list' element={<AppointmentList />} />
         <Route path='patient/search' element={<SearchDoctors />} />
@@ -83,20 +100,17 @@ function App() {
 
       </Route>
       {/* Doctor Routes with Sidebar */}
-      <Route path='/doctor' element={<PatientHomePage />}>
-        {/* <Route path='dashboard' element={<PatientProfile />} /> */}
+      <Route path='/doctor' element={<DoctorSideMenu />}>
+        <Route path='doctor/dashboard' element={<DoctorDashboard />} />
         {/* <Route path='patient/prescription' element={<PatientPrescription />} /> */}
         {/* <Route path='patient/chats/:userId' element={<Chat />} /> */}
-        {/* <Route path='patient/bookings' element={<AppointmentBooking />} /> */}
+        {/* <Route path='doctor/addprescription' element={<AddPrescriptons />} /> */}
         {/* <Route path='patient/list' element={<AppointmentList />} /> */}
         {/* <Route path='patient/search' element={<SearchDoctors />} /> */}
         <Route path='doctor/profile' element={<DoctorProfile />} />
-        {/* <Route path='patient/edit/:patientId' element={<EditMyProfile/>} /> */}
+        <Route path='doctor/edit/:doctorId' element={<EditMyProfileDoc/>} />
 
       </Route>
-{/* Logout Route */}
-        <Route path='/logout' element={<Logout handleLogout={handleLogout} />} />
-
     </Routes>
     
    </>

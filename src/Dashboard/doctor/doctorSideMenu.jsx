@@ -1,12 +1,13 @@
 import { Layout, Menu } from 'antd';
 import Sider from 'antd/es/layout/Sider';
-import React from 'react';
+import React, { useState } from 'react';
 import Logo from '../../Components/NavBarComponent/logo.png';
 import { AiOutlineBook, AiOutlineDashboard, AiOutlineFileAdd, AiOutlineHome, AiOutlineLogout, AiOutlineMedicineBox, AiOutlineMessage, AiOutlineProfile, AiOutlineSearch } from 'react-icons/ai';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 
 const DoctorSideMenu = () => {
-  const { doctorId } = useParams();
+const [collapsed, setCollapsed] = useState(false);
+  const { patientId } = useParams();
   const navigate = useNavigate();
 
   const handleMenuClick = (e) => {
@@ -15,7 +16,12 @@ const DoctorSideMenu = () => {
   return (
     <>
     <Layout className=''>
-      <Sider style={{ backgroundColor: '#ffffff' }}>
+      <Sider style={{ backgroundColor: '#ffffff' }}
+        collapsible
+        collapsed={collapsed}
+        onCollapse={(value) => setCollapsed(value)}
+      >
+        
         {/* Logo */}
         <div className='flex items-center justify-center'> 
           <img className='h-15 w-24 rounded-xl m-1' src={Logo} alt='logo'/>
@@ -23,13 +29,13 @@ const DoctorSideMenu = () => {
         {/* Menu List */}
         <div>
           <Menu className='text-start font-semibold' theme='light' mode='inline' onClick={handleMenuClick}> 
-            {/* <Menu.Item key="/patient/dashboard" icon={<AiOutlineDashboard/>}>Dashboard</Menu.Item> */}
-            {/* <Menu.Item key="/patient/patient/search" icon={<AiOutlineSearch/>}> Search</Menu.Item> */}
-            <Menu.Item key="/patient/patient/list" icon={<AiOutlineMessage/>}> My Chats</Menu.Item>
-            <Menu.Item key="/patient/patient/prescription" icon={<AiOutlineMedicineBox/>}> Add Prescription</Menu.Item>
-            <Menu.Item key="/patient/patient/bookings" icon={<AiOutlineBook/>}>Appointments</Menu.Item>
-            <Menu.Item key="/patient/patient/profile" icon={<AiOutlineProfile/>}> My Account</Menu.Item>
-            <Menu.Item key="logout" icon={<AiOutlineLogout/>}>LogOut</Menu.Item>
+            <Menu.Item key="/doctor/doctor/dashboard" icon={<AiOutlineDashboard/>}>Dashboard</Menu.Item>
+            <Menu.Item key="/doctor/doctor/search" icon={<AiOutlineSearch/>}> Search</Menu.Item>
+            <Menu.Item key="/doctor/doctor/chats" icon={<AiOutlineMessage/>}> My Chats</Menu.Item>
+            <Menu.Item key="/doctor/doctor/addprescription" icon={<AiOutlineMedicineBox/>}> Add New Prescription</Menu.Item>
+            <Menu.Item key="/doctor/doctor/bookings" icon={<AiOutlineBook/>}> My Bookings</Menu.Item>
+            <Menu.Item key="/doctor/doctor/profile" icon={<AiOutlineProfile/>}> My Account</Menu.Item>
+            <Menu.Item key="/logout" icon={<AiOutlineLogout/>}>LogOut</Menu.Item>
 
           </Menu>
         </div>

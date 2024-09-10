@@ -1,66 +1,77 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import axiosInstance from '../../config/axiosConfig';
+// ChatComponent.js
 
-const ChatPage = () => {
-  const { doctorId } = useParams(); // Get the doctor's ID from the URL
+import React, { useState, useEffect } from 'react';
+import io from 'socket.io-client';
+
+const ChatComponent = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
-  const userId = localStorage.getItem("userId");
-
+  const [socket, setSocket] = useState(null);
+  const user = JSON.parse(localStorage.getItem('user'));
 
   useEffect(() => {
-    // Fetch the messages between the logged-in patient and the selected doctor
-    const fetchMessages = async () => {
-      try {
-        const response = await axiosInstance.get(`/api/messages/${doctorId}`);
-        setMessages(response.data);
-      } catch (error) {
-        console.error('Error fetching messages:', error);
-      }
-    };
+    if (user && user.role) {
+      const newSocket = io('http://localhost:5000');
+      setSocket(newSocket);
 
-    fetchMessages();
-  }, [doctorId]);
+      newSocket.emit('join_room', user.role);
 
-  const handleSendMessage = async () => {
-    if (newMessage.trim() === '') return;
-
-    try {
-      const response = await axiosInstance.post('/api/messages/send', {
-        receiver: doctorId,
-        message: newMessage,
+      newSocket.on('receive_message', (message) => {
+        setMessages((prevMessages) => [...prevMessages, message]);
       });
 
-      // Update messages with the newly sent message
-      setMessages([...messages, response.data]);
+      return () => {
+        newSocket.disconnect();
+      };
+    }
+  }, [user]);
+
+  const sendMessage = () => {
+    if (socket && newMessage.trim()) {
+      const messageData = {
+        author: user.username,
+        message: newMessage,
+        timestamp: new Date().toLocaleTimeString(),
+        role: user.role,
+      };
+
+      socket.emit('send_message', messageData);
+      setMessages((prevMessages) => [...prevMessages, messageData]);
       setNewMessage('');
-    } catch (error) {
-      console.error('Error sending message:', error);
     }
   };
 
+  if (!user || !user.role) {
+    return <div className="text-red-500">Error: User not found or role is missing</div>;
+  }
+
   return (
-    <div className="chat-container">
-      <div className="messages">
-        {messages.map((msg, index) => (
-          <div key={index} className={`message ${msg.sender === userId ? 'from-doctor' : 'from-patient'}`}>
-            <p>{msg.message}</p>
-            <small>{new Date(msg.timestamp).toLocaleString()}</small>
-          </div>
-        ))}
-      </div>
-      <div className="send-message">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#f4f4f4]">
+      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <h2 className="text-2xl font-bold mb-6 text-gray-800">Chat</h2>
+        <div className="mb-4 h-64 overflow-y-auto">
+          {messages.map((msg, index) => (
+            <div key={index} className="mb-2">
+              <strong>{msg.author}</strong>: {msg.message} <em>{msg.timestamp}</em>
+            </div>
+          ))}
+        </div>
         <input
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-100"
           type="text"
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder="Type your message..."
         />
-        <button onClick={handleSendMessage}>Send</button>
+        <button
+          className="w-full bg-[#567fbf] text-white py-2 px-4 rounded-md hover:bg-[#3a5e8c] mt-2"
+          onClick={sendMessage}
+        >
+          Send
+        </button>
       </div>
     </div>
   );
 };
 
-export default ChatPage;
+export default ChatComponent;

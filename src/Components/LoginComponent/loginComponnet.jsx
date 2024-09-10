@@ -44,7 +44,7 @@ const LoginComponent = () => {
   const [loginData, setLoginData] = useState({
     email: "",
     password: "",
-    role: "",
+    role: "patient",
   });
 
   const [errors, setErrors] = useState({});
@@ -81,11 +81,10 @@ const LoginComponent = () => {
         const { patientId } = response.data; 
         console.log(response);
         // set token in local storage
-        // Inside your login success callback
-        localStorage.setItem("token", response.data.token);
-        const decodedToken = jwtDecode(response.data.token);
-        localStorage.setItem("userId", decodedToken.user.id); // Ensure user._id is stored
-        
+          // Inside your login success callback
+          localStorage.setItem("token", response.data.token);
+          const decodedToken = jwtDecode(response.data.token);
+          localStorage.setItem("userId", decodedToken.user.id);
         
 
         // show success message
