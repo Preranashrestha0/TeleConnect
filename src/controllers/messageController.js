@@ -1,69 +1,72 @@
+const message = require('../models/messageModel');
 const Message = require('../models/messageModel');
 
-// Create a new message
-const createMessage = async (req, res) => {
-  try {
-    const message = new Message(req.body);
-    await message.save();
-    res.status(201).send(message);
-  } catch (error) {
-    res.status(400).send(error);
-  }
+// // Create a new message
+// const sendMessage =  async (req, res) => {
+//   const { message, receiver, sender } = req.body;
+
+//   try {
+//     const newMessage = new Message({ sender, receiver, message });
+//     await newMessage.save();
+//     res.status(201).json(newMessage);
+// } catch (err) {
+//     res.status(500).json({ error: err.message });
+// }
+
+// };
+
+// // Get messages between two users
+// const fetchMessages = async (req, res) => {
+//   const { doctorId, userId } = req.params;
+
+//   try {
+//     const messages = await Message.find({
+//       $or: [
+//         { sender: userId, receiver: doctorId },
+//         { sender: doctorId, receiver: userId },
+//       ],
+//     }).sort({ timestamp: 1 });
+
+//     res.json(messages);
+//   } catch (error) {
+//     console.error('Error fetching messages:', error);
+//     res.status(500).json({ message: 'Server error' });
+//   }
+// };
+
+
+// Send message
+const sendMessage= async (req, res) => {
+  const { sender, receiver, content } = req.body;
+  const message = new Message({ sender, receiver, content });
+  await message.save();
+  res.status(201).send(message);
 };
 
-// Get all messages
- const getMessages = async (req, res) => {
-  try {
-    const messages = await Message.find({});
-    res.status(200).send(messages);
-  } catch (error) {
-    res.status(500).send(error);
-  }
+// Get messages between two users
+const fetchMessages = async (req, res) => {
+  const { sender, receiver } = req.query;
+  const messages = await Message.find({
+      $or: [
+          { sender, receiver },
+          { sender: receiver, receiver: sender }
+      ]
+  }).sort({ timestamp: 1 });
+  res.send(messages);
 };
 
-// Get a message by ID
-const getMessageById = async (req, res) => {
-  try {
-    const message = await Message.findById(req.params.id);
-    if (!message) {
-      return res.status(404).send();
-    }
-    res.status(200).send(message);
-  } catch (error) {
-    res.status(500).send(error);
+const loadMessage = async(req, res) => {
+  try{
+    const messages = await message.find().sort({timestamp :1}).exec();
+    res.status(200).json(messages);
   }
-};
-
-// Update a message
-const updateMessage = async (req, res) => {
-  try {
-    const message = await Message.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
-    if (!message) {
-      return res.status(404).send();
-    }
-    res.status(200).send(message);
-  } catch (error) {
-    res.status(400).send(error);
+  catch (err){
+    console.log(err);
+    res.status(500).json({ message: 'Server error' });
   }
-};
-
-// Delete a message
-const deleteMessage = async (req, res) => {
-  try {
-    const message = await Message.findByIdAndDelete(req.params.id);
-    if (!message) {
-      return res.status(404).send();
-    }
-    res.status(200).send(message);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-};
-
+}
 module.exports = {
-    createMessage,
-    getMessages,
-    getMessageById,
-    updateMessage,
-    deleteMessage
+  sendMessage,
+  fetchMessages,
+  loadMessage
 }

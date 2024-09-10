@@ -1,7 +1,7 @@
-const User = require('../models/user');
+const User = require('../models/authUserModel');
 
 // Create a new user
-exports.createUser = async (req, res) => {
+const createUser = async (req, res) => {
   try {
     const user = new User(req.body);
     await user.save();
@@ -12,7 +12,7 @@ exports.createUser = async (req, res) => {
 };
 
 // Get all users
-exports.getUsers = async (req, res) => {
+const getUsers = async (req, res) => {
   try {
     const users = await User.find({});
     res.status(200).send(users);
@@ -22,7 +22,7 @@ exports.getUsers = async (req, res) => {
 };
 
 // Get a user by ID
-exports.getUserById = async (req, res) => {
+const getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
@@ -35,7 +35,7 @@ exports.getUserById = async (req, res) => {
 };
 
 // Update a user
-exports.updateUser = async (req, res) => {
+const updateUser = async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
     if (!user) {
@@ -48,7 +48,7 @@ exports.updateUser = async (req, res) => {
 };
 
 // Delete a user
-exports.deleteUser = async (req, res) => {
+const deleteUser = async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
     if (!user) {
@@ -59,3 +59,11 @@ exports.deleteUser = async (req, res) => {
     res.status(500).send(error);
   }
 };
+
+module.exports ={
+  createUser,
+  getUsers,
+  getUserById,
+  updateUser,
+  deleteUser
+}

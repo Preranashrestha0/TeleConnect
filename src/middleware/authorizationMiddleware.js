@@ -12,13 +12,6 @@ function authorizeRole(role) {
       const userRole = String(user.role).trim();
       const requiredRole = String(role).trim();
 
-      // console.log('User role from DB:', user.role, 'Length:', user.role.length);
-      // console.log('Required role:', role, 'Length:', role.length);
-      // console.log('Trimmed User role:', userRole, 'Length:', userRole.length);
-      // console.log('Trimmed Required role:', requiredRole, 'Length:', requiredRole.length);
-      // console.log('Comparison result:', userRole !== requiredRole);
-
-
       if (userRole !== requiredRole) {
         return res.sendStatus(403); // Forbidden if user does not have the required role
       }
@@ -30,5 +23,4 @@ function authorizeRole(role) {
     }
   };
 }
-
 module.exports = { authorizeRole };

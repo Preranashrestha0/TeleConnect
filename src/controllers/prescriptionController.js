@@ -1,70 +1,72 @@
-const Prescription = require('../models/prescription');
-const Message = require('../models/prescription');
+const Prescription = require('../models/Prescription');
+const User = require('../models/authUserModel');
 
-// Create a new message
-const createPrescription = async (req, res) => {
-  try {
-    const prescription = new Prescription(req.body);
-    await prescription.save();
-    res.status(201).send(prescription);
-  } catch (error) {
-    res.status(400).send(error);
-  }
-};
 
-// Get all messages
- const getPrescription = async (req, res) => {
+const addPrescription = async (req, res) => {
   try {
-    const prescription = await Prescription.find({});
-    res.status(200).send(prescription);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-};
+    const { doctorId, patientId, medications, instructions } = req.body;
 
-// Get a message by ID
-const getPrescriptionbyId = async (req, res) => {
-  try {
-    const prescription = await Prescription.findById(req.params.id);
-    if (!prescription) {
-      return res.status(404).send();
+    // Validate doctor and patient
+    const doctor = await User.findById(doctorId);
+    const patient = await User.findById(patientId);
+
+    if (!doctor || doctor.role !== 'doctor') {
+      return res.status(400).json({ message: 'Invalid doctor ID' });
     }
-    res.status(200).send(prescription);
+
+    if (!patient || patient.role !== 'patient') {
+      return res.status(400).json({ message: 'Invalid patient ID' });
+    }
+
+    const newPrescription = new Prescription({
+      doctorId,
+      patientId,
+      medications,
+      instructions
+    });
+
+    await newPrescription.save();
+    res.status(201).json({ message: 'Prescription created successfully', prescription: newPrescription });
   } catch (error) {
-    res.status(500).send(error);
+    res.status(500).json({ message: 'Error creating prescription', error });
   }
 };
 
-// Update a message
-const updatePrescription = async (req, res) => {
+const getPrescription = async (req, res) => {
   try {
-    const prescription = await Prescription.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
-    if (!prescription) {
-      return res.status(404).send();
-    }
-    res.status(200).send(prescription);
+    const prescriptions = await Prescription.find({ doctorId: req.params.doctorId })
+      .populate('patientId', 'firstName lastName')
+      .populate('doctorId', 'firstName lastName');
+    res.status(200).json({ prescriptions });
   } catch (error) {
-    res.status(400).send(error);
+    res.status(500).json({ message: 'Error fetching prescriptions', error });
   }
 };
 
-// Delete a message
-const deletePrescription = async (req, res) => {
+const getPrescriptionsForPatient = async (req, res) => {
   try {
-    const prescription = await Prescription.findByIdAndDelete(req.params.id);
-    if (!prescription) {
-      return res.status(404).send();
+    const { patientId } = req.params;
+    
+    // Validate patient ID
+    const patient = await User.findById(patientId);
+    
+    if (!patient || patient.role !== 'patient') {
+      return res.status(400).json({ message: 'Invalid patient ID' });
     }
-    res.status(200).send(prescription);
+
+    const prescriptions = await Prescription.find({ patientId })
+      .populate('doctorId', 'firstName lastName')
+      .exec();
+
+    res.status(200).json({ prescriptions });
   } catch (error) {
-    res.status(500).send(error);
+    console.error('Error fetching prescriptions:', error);
+    res.status(500).json({ message: 'Server error' });
   }
-};
+}
 
 module.exports = {
-    createPrescription,
-    getPrescription,
-    getPrescriptionbyId,
-    updatePrescription,
-    deletePrescription
-}
+  addPrescription,
+  getPrescription,
+  getPrescriptionsForPatient
+};

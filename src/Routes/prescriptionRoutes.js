@@ -1,20 +1,11 @@
-// const express = require('express');
-// const router = express.Router();
-// const {createPrescription, getPrescription ,getPrescriptionbyId, updatePrescription, deletePrescription} = require('../controllers/prescriptionController');
+const express = require('express');
+const { addPrescription, getPrescription, getPrescriptionsForPatient } = require('../controllers/prescriptionController');
+const authMiddleware = require('../middleware/authMiddleware');
 
-// // Create a new review
-// router.post('/reviews', createPrescription);
+const router = express.Router();
 
-// // Get all reviews
-// router.get('/reviews', getPrescription);
+router.post('/add', addPrescription);
+router.get('/doctor/:doctorId', getPrescription);
+router.get('/patient/:patientId', authMiddleware, getPrescriptionsForPatient);
 
-// // Get a review by ID
-// router.get('/reviews/:id', getPrescriptionbyId);
-
-// // Update a review
-// router.put('/reviews/:id', updatePrescription);
-
-// // Delete a review
-// router.delete('/reviews/:id', deletePrescription);
-
-// module.exports = router;
+module.exports = router;

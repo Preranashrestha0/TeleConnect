@@ -1,5 +1,10 @@
-// const express = require('express');
-// const router = express.Router();
+const express = require('express');
+const { fetchMessages, sendMessage, loadMessage } = require('../controllers/messageController');
+const authMiddleware = require('../middleware/authMiddleware');
+const router = express.Router();
+
+router.post('/messages',  sendMessage)
+router.get('/messages', fetchMessages)
 // const {createMessage, getMessages, getMessageById, updateMessage, deleteMessage} = require('../controllers/messageController');
 
 // // Create a new message
@@ -17,4 +22,4 @@
 // // Delete a message
 // router.delete('/messages/:id', deleteMessage);
 
-// module.exports = router;
+module.exports = router;

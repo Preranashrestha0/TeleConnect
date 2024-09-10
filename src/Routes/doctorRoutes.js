@@ -1,9 +1,27 @@
-// const express = require('express');
-// const userProfile = require('../controllers/usersController');
-// const { createDoctor } = require('../controllers/doctorController');
+const express = require('express');
+const {
+    registerDoctor,
+    updateDoctor,
+    deleteDoctor,
+    getDoctors,
+    getDoctorById,
+    updateDoctorbyPst
+  } = require('../controllers/doctorController');
+const authMiddleware = require('../middleware/authMiddleware');
+const {authorizeRole} = require('../middleware/authorizationMiddleware');
+const { profileImage } = require('../middleware/uploadMiddleware');
+const router = express.Router();
 
-// const router = express.Router();
+router.post('/registerDoctor',  registerDoctor);
 
-// router.post('/doctor', createDoctor);
+router.get('/get/:doctorId',  getDoctorById);
 
-// module.exports = router;
+router.get('/doctor', getDoctors);
+
+router.put('/update/:doctorId', authMiddleware, authorizeRole('admin', 'doctor'), profileImage.single('profileImage'), updateDoctor);
+
+
+router.put('/updatedoc/:id',  authMiddleware, authorizeRole('admin'), profileImage.single('profileImage'), updateDoctorbyPst  );
+
+
+module.exports = router;

@@ -1,61 +1,40 @@
+const Prescription = require('../models/Prescription');
 const Review = require('../models/reviewsModel');
 
-// Create a new review
-exports.createReview = async (req, res) => {
+const addReview = async (req, res) => {
   try {
-    const review = new Review(req.body);
-    await review.save();
-    res.status(201).send(review);
-  } catch (error) {
-    res.status(400).send(error);
-  }
-};
+    const { prescriptionId, review } = req.body;
+    const userId = req.user._id; // Assuming user ID is available in req.user
 
-// Get all reviews
-exports.getReviews = async (req, res) => {
-  try {
-    const reviews = await Review.find({});
-    res.status(200).send(reviews);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-};
-
-// Get a review by ID
-exports.getReviewById = async (req, res) => {
-  try {
-    const review = await Review.findById(req.params.id);
-    if (!review) {
-      return res.status(404).send();
+    // Validate that the prescription exists
+    const prescription = await Prescription.findById(prescriptionId);
+    if (!prescription) {
+      return res.status(404).json({ message: 'Prescription not found' });
     }
-    res.status(200).send(review);
+
+    const newReview = new Review({ prescriptionId, userId, review });
+    await newReview.save();
+
+    res.status(201).json({ message: 'Review added successfully', review: newReview });
   } catch (error) {
-    res.status(500).send(error);
+    console.error('Error adding review:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
-// Update a review
-exports.updateReview = async (req, res) => {
+const getReviewsByPrescriptionId = async (req, res) => {
   try {
-    const review = await Review.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
-    if (!review) {
-      return res.status(404).send();
-    }
-    res.status(200).send(review);
+    const { prescriptionId } = req.params;
+    const reviews = await Review.find({ prescriptionId }).populate('userId', 'firstName lastName');
+    
+    res.status(200).json({ reviews });
   } catch (error) {
-    res.status(400).send(error);
+    console.error('Error fetching reviews:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
-// Delete a review
-exports.deleteReview = async (req, res) => {
-  try {
-    const review = await Review.findByIdAndDelete(req.params.id);
-    if (!review) {
-      return res.status(404).send();
-    }
-    res.status(200).send(review);
-  } catch (error) {
-    res.status(500).send(error);
-  }
+module.exports = {
+  addReview,
+  getReviewsByPrescriptionId
 };

@@ -1,20 +1,9 @@
-// const express = require('express');
-// const router = express.Router();
-// const reviewController = require('../controllers/reviewConntroller');
+const express = require('express');
+const authMiddleware = require('../middleware/authMiddleware');
+const { addReview, getReviewsByPrescriptionId } = require('../controllers/reviewConntroller');
+const router = express.Router();
 
-// // Create a new review
-// router.post('/reviews', reviewController.createReview);
+router.post('/add', authMiddleware, addReview);
+router.get('/prescription/:prescriptionId', getReviewsByPrescriptionId);
 
-// // Get all reviews
-// router.get('/reviews', reviewController.getReviews);
-
-// // Get a review by ID
-// router.get('/reviews/:id', reviewController.getReviewById);
-
-// // Update a review
-// router.put('/reviews/:id', reviewController.updateReview);
-
-// // Delete a review
-// router.delete('/reviews/:id', reviewController.deleteReview);
-
-// module.exports = router;
+module.exports = router;
